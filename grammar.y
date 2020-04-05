@@ -120,6 +120,8 @@ a_expr : a_expr T_ADD a_term
         {
           // TASK: Modify this semantic action to support both DTYPE_INT and DTYPE_FLOAT.
           // For DTYPE_FLOAT you should generate an OP_FADD instruction.
+	  res = make_temp (symtab, $1->datatype);
+          itab_instruction_add (itab, OP_ADD, res->addr, $1->addr, $3->addr);
         }
         $$ = res;
         #ifdef _SMP_DEBUG_
@@ -138,6 +140,11 @@ a_expr : a_expr T_ADD a_term
         if ($1->datatype == DTYPE_INT)
         {
           res = make_temp (symtab, $1->datatype);
+          itab_instruction_add (itab, OP_SUB, res->addr, $1->addr, $3->addr);
+        }
+	 if ($1->datatype == DTYPE_FLOAT)
+        {
+	  res = make_temp (symtab, $1->datatype);
           itab_instruction_add (itab, OP_SUB, res->addr, $1->addr, $3->addr);
         }
         $$ = res;
@@ -168,6 +175,11 @@ a_term : a_term T_MUL a_fact
           res = make_temp (symtab, $1->datatype);
           itab_instruction_add (itab, OP_MUL, res->addr, $1->addr, $3->addr);
         }
+	 if ($1->datatype == DTYPE_FLOAT)
+        {
+	  res = make_temp (symtab, $1->datatype);
+          itab_instruction_add (itab, OP_MUL, res->addr, $1->addr, $3->addr);
+        }
         $$ = res;
       }
     | a_term T_DIV a_fact
@@ -180,6 +192,11 @@ a_term : a_term T_MUL a_fact
         // TASK: Complete support for OP_DIV and OP_FDIV. See OP_ADD and OP_FADD code above.
         symbol_t * res;
         if ($1->datatype == DTYPE_INT)
+        {
+          res = make_temp (symtab, $1->datatype);
+          itab_instruction_add (itab, OP_DIV, res->addr, $1->addr, $3->addr);
+        }
+	if ($1->datatype == DTYPE_FLOAT)
         {
           res = make_temp (symtab, $1->datatype);
           itab_instruction_add (itab, OP_DIV, res->addr, $1->addr, $3->addr);
